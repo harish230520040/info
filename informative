@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Interactive Quiz & Fun Games</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { 
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
+            margin: 0;
+        }
+        .container {
+            max-width: 540px;
+            margin: 40px auto;
+            background: #fff;
+            padding: 32px 36px 42px 36px;
+            border-radius: 14px;
+            box-shadow: 0 6px 24px rgba(44, 62, 80, 0.13);
+            border: 3px solid #6a82fb;
+            position: relative;
+            overflow: hidden;
+            animation: bounceIn 1.3s cubic-bezier(.68,-0.55,.27,1.55);
+        }
+        @keyframes bounceIn {
+            0% { transform: scale(0.8) translateY(80px); opacity: 0; }
+            60% { transform: scale(1.05) translateY(-10px); opacity: 1; }
+            80% { transform: scale(0.95) translateY(5px); }
+            100% { transform: scale(1) translateY(0); }
+        }
+        h1 {
+            text-align: center;
+            color: #6a82fb;
+            margin-bottom: 5px;
+            font-family: 'Segoe UI Black', Arial, sans-serif;
+        }
+        .info {
+            text-align: center;
+            color: #333;
+            font-size: 1.09em;
+            margin-bottom: 26px;
+            background: #e0e7ff;
+            border-radius: 6px;
+            padding: 10px 0;
+            animation: fadeIn 1.2s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .level-select {
+            text-align: center;
+            margin-bottom: 32px;
+            animation: fadeIn 1.2s;
+        }
+        .level-btn {
+            background: linear-gradient(90deg, #6a82fb 0%, #fc5c7d 100%);
+            color: #fff;
+            border: none;
+            padding: 12px 28px;
+            font-size: 1.05em;
+            border-radius: 32px;
+            margin: 0 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.12s, background 0.19s;
+            box-shadow: 0 2px 10px #e0e7ff;
+        }
+        .level-btn.selected, .level-btn:hover {
+            background: linear-gradient(90deg, #fc5c7d 0%, #6a82fb 100%);
+            transform: scale(1.08);
+        }
+        .topic-games {
+            text-align: center;
+            margin: 0 0 16px 0;
+        }
+        .topic-btn {
+            background: linear-gradient(90deg, #fccb90 0%, #d57eea 100%);
+            color: #333;
+            border: none;
+            padding: 10px 18px;
+            font-size: 1em;
+            border-radius: 24px;
+            margin: 0 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.15s, transform 0.13s;
+            box-shadow: 0 2px 8px #e0e7ff;
+        }
+        .topic-btn.selected, .topic-btn:hover {
+            background: linear-gradient(90deg, #d57eea 0%, #fccb90 100%);
+            color: #6a82fb;
+            transform: scale(1.09);
+        }
+        .level-label {
+            display: inline-block;
+            background: linear-gradient(90deg, #fc5c7d 0%, #6a82fb 100%);
+            color: #fff;
+            font-weight: bold;
+            padding: 5px 18px;
+            font-size: 1.08em;
+            border-radius: 20px;
+            margin: 10px auto 20px auto;
+            text-align: center;
+            box-shadow: 0 2px 7px rgba(44, 62, 80, 0.13);
+            animation: fadeIn 0.8s;
+        }
+        .question {
+            font-size: 1.18em;
+            font-weight: 500;
+            color: #303f9f;
+            margin-bottom: 20px;
+            animation: slideIn 1s;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(-60px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .answers { list-style: none; padding: 0; margin: 0; }
+        .answers li {
+            margin-bottom: 16px;
+            animation: fadeIn 0.8s;
+        }
+        .answers label {
+            background: #f3f7fa;
+            display: block;
+            padding: 10px 18px;
+            border-radius: 6px;
+            transition: background 0.2s, box-shadow 0.2s, color 0.2s;
+            cursor: pointer;
+            border: 2px solid transparent;
+            font-size: 1em;
+            box-shadow: 0 0 0 rgba(0,0,0,0);
+        }
+        .answers input[type="radio"]:checked + span {
+            color: #fff;
+            background: #907cff;
+        }
+        .answers input[type="radio"] {
+            display: none;
+        }
+        .answers label:hover {
+            background: #e3eeff;
+            box-shadow: 0 1px 8px #e6e6e6;
+        }
+        .answers input[type="radio"]:checked + span {
+            background: #6a82fb;
+            color: #fff;
+        }
+        .answers span {
+            vertical-align: middle;
+            transition: background 0.3s, color 0.3s;
+            padding: 0 4px;
+            border-radius: 4px;
+        }
+        #next-btn, #restart-btn, #play-game-btn {
+            background: linear-gradient(90deg, #6a82fb 0%, #fc5c7d 100%);
+            color: #fff;
+            border: none;
+            padding: 14px 0;
+            font-size: 1em;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 22px;
+            width: 100%;
+            transition: background 0.2s, transform 0.1s;
+            font-weight: bold;
+            letter-spacing: 1px;
+            box-shadow: 0 2px 10px #e0e7ff;
+        }
+        #next-btn:hover, #restart-btn:hover, #play-game-btn:hover {
+            background: linear-gradient(90deg, #fc5c7d 0%, #6a82fb 100%);
+            transform: scale(1.04);
+        }
+        #restart-btn {
+            background: linear-gradient(90deg, #43cea2 0%, #185a9d 100%);
+        }
+        #restart-btn:hover {
+            background: linear-gradient(90deg, #185a9d 0%, #43cea2 100%);
+        }
+        #score {
+            text-align: center;
+            font-size: 1.5em;
+            margin: 30px 0;
+            color: #2e7d32;
+            animation: fadeIn 1.2s;
+        }
+        .progress-bar-bg {
+            background: #e0e7ff;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            height: 18px;
+            box-shadow: 0 2px 7px #e0e7ff;
+        }
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #6a82fb 0%, #fc5c7d 100%);
+            width: 0;
+            transition: width 0.6s cubic-bezier(.77,0,.18,1.11);
+        }
+        .info-anim {
+            margin-top:16px; 
+            padding:12px; 
+            border-radius:6px; 
+            background:#e6f9e7; 
+            color:#288f2d;
+            border:1.5px solid #36bb47;
+            font-size: 1.04em;
+            animation: popInfo 0.8s;
+        }
+        .info-anim.wrong {
+            background:#ffe6e6; 
+            color:#a71111;
+            border:1.5px solid #ff6e6e;
+        }
+        @keyframes popInfo {
+            0% { transform: scale(0.6) translateY(35px); opacity: 0; }
+            60% { transform: scale(1.08) translateY(-2px); opacity: 1; }
+            85% { transform: scale(0.97) translateY(2px);}
+            100% { transform: scale(1) translateY(0);}
+        }
+        .confetti {
+            position: absolute;
+            left: 0; top: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 99;
+        }
+        .confetti-piece {
+            position: absolute;
+            width: 12px; height: 12px;
+            border-radius: 3px;
+            background: linear-gradient(135deg, #6a82fb, #fc5c7d, #43cea2, #ffd86f, #e040fb);
+            opacity: 0.85;
+            animation: confetti-fall 1.8s linear forwards;
+        }
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-30px) rotateZ(0deg) scale(1.2);
+                opacity: 0.85;
+            }
+            90% {
+                opacity: 0.9;
+            }
+            100% {
+                transform: translateY(420px) rotateZ(360deg) scale(0.85);
+                opacity: 0.2;
+            }
+        }
+        /* Fun Game Styles */
+        .game-section {
+            margin-top: 20px;
+            text-align: center;
+            animation: fadeIn 1.1s;
+        }
+        .hangman-word {
+            font-size: 1.35em;
+            letter-spacing: 8px;
+            margin: 20px 0 12px 0;
+            color: #6a82fb;
+        }
+        .hangman-letters {
+            margin: 10px 0 22px 0;
+        }
+        .hangman-letters button {
+            margin: 2px;
+            padding: 7px 12px;
+            border-radius: 5px;
+            border: none;
+            background: #e0e7ff;
+            color: #433;
+            font-size: 1.01em;
+            cursor: pointer;
+            transition: background 0.15s, color 0.15s;
+        }
+        .hangman-letters button:disabled {
+            background: #fc5c7d;
+            color: #fff;
+            cursor: not-allowed;
+        }
+        .hangman-status {
+            margin: 8px 0 0 0;
+            font-size: 1.06em;
+            color: #a71111;
+            min-height: 20px;
+        }
+        .memory-board {
+            display: grid;
+            grid-template-columns: repeat(4, 50px);
+            gap: 12px;
+            justify-content: center;
+            margin: 16px 0;
+        }
+        .memory-card {
+            width: 50px; height: 50px;
+            background: #e0e7ff;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            cursor: pointer;
+            transition: background 0.18s;
+            user-select: none;
+        }
+        .memory-card.flipped {
+            background: #fc5c7d;
+            color: #fff;
+        }
+        .memory-status {
+            margin: 10px 0 0 0;
+            font-size: 1.06em;
+            color: #185a9d;
+            min-height: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="quiz-container">
+        <h1>Interactive Quiz & Fun Games</h1>
+        <div class="info">
+            Welcome! Choose your level and topic to start the quiz, or play fun, informative games.<br>
+            This site is educational and entertaining—perfect for learning and having fun!
+        </div>
+        <div class="level-select" id="level-select">
+            <span style="font-weight: 600; color: #303f9f;">Choose a level:</span>
+            <button class="level-btn" onclick="chooseLevel('Easy')">Easy</button>
+            <button class="level-btn" onclick="chooseLevel('Medium')">Medium</button>
+            <button class="level-btn" onclick="chooseLevel('Hard')">Hard</button>
+        </div>
+        <div class="topic-games" id="topic-select" style="display:none;">
+            <span style="font-weight: 600; color: #303f9f;">Choose a topic:</span>
+            <button class="topic-btn" onclick="chooseTopic('General')">General</button>
+            <button class="topic-btn" onclick="chooseTopic('Science')">Science</button>
+            <button class="topic-btn" onclick="chooseTopic('Math')">Math</button>
+        </div>
+        <div class="progress-bar-bg" id="progress-bar-bg" style="display:none;">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        <div id="quiz"></div>
+        <div class="confetti" id="confetti"></div>
+    </div>
+    <script>
+        // QUESTIONS DATABASE
+        const allQuizData = {
+            Easy: {
+                General: [
+                    {
+                        question: "What is the capital of France?",
+                        options: ["London", "Paris", "Berlin", "Madrid"],
+                        answer: 1,
+                        info: "Paris is the capital and most populous city of France."
+                    },
+                    {
+                        question: "What is 2 + 2?",
+                        options: ["3", "4", "5", "2"],
+                        answer: 1,
+                        info: "2 + 2 equals 4."
+                    }
+                ],
+                Science: [
+                    {
+                        question: "Which planet is known as the Red Planet?",
+                        options: ["Mars", "Venus", "Jupiter", "Saturn"],
+                        answer: 0,
+                        info: "Mars is called the Red Planet due to its reddish appearance."
+                    },
+                    {
+                        question: "What do bees make?",
+                        options: ["Milk", "Honey", "Bread", "Jam"],
+                        answer: 1,
+                        info: "Bees make honey from flower nectar."
+                    }
+                ],
+                Math: [
+                    {
+                        question: "Which number comes after 9?",
+                        options: ["8", "10", "11", "12"],
+                        answer: 1,
+                        info: "10 comes after 9."
+                    },
+                    {
+                        question: "What is 5 - 3?",
+                        options: ["1", "2", "3", "4"],
+                        answer: 1,
+                        info: "5 minus 3 is 2."
+                    }
+                ]
+            },
+            Medium: {
+                General: [
+                    {
+                        question: "Who wrote 'Romeo and Juliet'?",
+                        options: ["Charles Dickens", "William Shakespeare", "Mark Twain", "Jane Austen"],
+                        answer: 1,
+                        info: "'Romeo and Juliet' is a famous tragedy by William Shakespeare."
+                    },
+                    {
+                        question: "Which continent is Egypt in?",
+                        options: ["Asia", "Africa", "Europe", "America"],
+                        answer: 1,
+                        info: "Egypt is a country in northeastern Africa."
+                    }
+                ],
+                Science: [
+                    {
+                        question: "What gas do plants breathe in?",
+                        options: ["Oxygen", "Carbon Dioxide", "Nitrogen", "Hydrogen"],
+                        answer: 1,
+                        info: "Plants take in carbon dioxide (CO₂) during photosynthesis."
+                    },
+                    {
+                        question: "Which organ pumps blood through the body?",
+                        options: ["Brain", "Lungs", "Heart", "Liver"],
+                        answer: 2,
+                        info: "The heart pumps blood throughout the body."
+                    }
+                ],
+                Math: [
+                    {
+                        question: "What is the value of π (pi) to 2 decimal places?",
+                        options: ["3.12", "3.14", "2.14", "3.41"],
+                        answer: 1,
+                        info: "π (pi) is approximately 3.14."
+                    },
+                    {
+                        question: "What is 12 divided by 3?",
+                        options: ["2", "3", "4", "5"],
+                        answer: 2,
+                        info: "12 divided by 3 equals 4."
+                    }
+                ]
+            },
+            Hard: {
+                General: [
+                    {
+                        question: "Which year did the World Wide Web become public?",
+                        options: ["1991", "1985", "1998", "2000"],
+                        answer: 0,
+                        info: "The World Wide Web was made publicly available in 1991."
+                    },
+                    {
+                        question: "Which element has the chemical symbol 'Fe'?",
+                        options: ["Lead", "Iron", "Silver", "Gold"],
+                        answer: 1,
+                        info: "Fe is the chemical symbol for Iron."
+                    }
+                ],
+                Science: [
+                    {
+                        question: "What is the powerhouse of the cell?",
+                        options: ["Nucleus", "Mitochondria", "Ribosome", "Chloroplast"],
+                        answer: 1,
+                        info: "Mitochondria generate most of the cell's energy supply."
+                    },
+                    {
+                        question: "What is H₂O commonly known as?",
+                        options: ["Hydrogen", "Oxygen", "Water", "Salt"],
+                        answer: 2,
+                        info: "H₂O is the chemical formula for water."
+                    }
+                ],
+                Math: [
+                    {
+                        question: "What is the derivative of sin(x)?",
+                        options: ["cos(x)", "-sin(x)", "-cos(x)", "sin(x)"],
+                        answer: 0,
+                        info: "The derivative of sin(x) with respect to x is cos(x)."
+                    },
+                    {
+                        question: "Solve for x: 2x + 6 = 14",
+                        options: ["3", "4", "5", "6"],
+                        answer: 2,
+                        info: "2x + 6 = 14 ⇒ 2x = 8 ⇒ x = 4."
+                    }
+                ]
+            }
+        };
+
+        // Fun Games Database (Games per topic)
+        const games = {
+            General: [
+                {
+                    name: "Hangman",
+                    component: showHangmanGame,
+                    description: "Guess the hidden word letter by letter! Words are related to general knowledge."
+                }
+            ],
+            Science: [
+                {
+                    name: "Memory Match",
+                    component: showMemoryGame,
+                    description: "Match pairs of science symbols or concepts. Improves memory and science knowledge!"
+                }
+            ],
+            Math: [
+                {
+                    name: "Number Puzzle",
+                    component: showNumberPuzzle,
+                    description: "Rearrange numbers to solve a puzzle! Exercise your math and logic skills."
+                }
+            ]
+        };
+
+        // Hangman word list (general knowledge)
+        const hangmanWords = [
+            { word: "PARIS", clue: "Capital of France" },
+            { word: "EGYPT", clue: "Country with pyramids" },
+            { word: "PYTHON", clue: "Popular programming language, also a snake" }
+        ];
+
+        // Science memory match (symbol: meaning)
+        const sciencePairs = [
+            { symbol: "H₂O", meaning: "Water" },
+            { symbol: "CO₂", meaning: "Carbon Dioxide" },
+            { symbol: "NaCl", meaning: "Salt" },
+            { symbol: "O₂", meaning: "Oxygen" }
+        ];
+
+        // Math number puzzle (shuffled numbers 1-8 for 3x3 grid)
+        const numberPuzzleOriginal = [1,2,3,4,5,6,7,8,""];
+
+        // STATE
+        let level = null;
+        let topic = null;
+        let quizData = [];
+        let currentQ = 0;
+        let score = 0;
+
+        // UI LOGIC
+        function chooseLevel(selectedLevel) {
+            level = selectedLevel;
+            topic = null;
+            document.getElementById('level-select').style.display = 'none';
+            document.getElementById('topic-select').style.display = 'block';
+            // Highlight selected
+            document.querySelectorAll('.level-btn').forEach(btn => {
+                btn.classList.toggle('selected', btn.innerText === selectedLevel);
+            });
+        }
+
+        function chooseTopic(selectedTopic) {
+            topic = selectedTopic;
+            quizData = [...allQuizData[level][topic]];
+            currentQ = 0;
+            score = 0;
+            document.getElementById('topic-select').style.display = 'none';
+            document.getElementById('progress-bar-bg').style.display = 'block';
+            document.getElementById('confetti').innerHTML = '';
+            loadQuiz();
+            showGameButton();
+        }
+
+        function showGameButton() {
+            const quiz = document.getElementById('quiz');
+            quiz.innerHTML += `
+                <div class="game-section" id="game-section">
+                    <button id="play-game-btn" onclick="showGame()">Play a fun ${topic} game!</button>
+                </div>
+            `;
+        }
+
+        function showGame() {
+            // Find the first game for the topic (can be extended)
+            const game = games[topic][0];
+            if (game && typeof game.component === "function") {
+                game.component();
+            }
+        }
+
+        function getLevelLabel() {
+            return `<div class="level-label">Level: ${level} | Topic: ${topic}</div>`;
+        }
+
+        function loadQuiz() {
+            const quiz = document.getElementById('quiz');
+            const progressBar = document.getElementById('progress-bar');
+            const percent = ((currentQ) / quizData.length) * 100;
+            progressBar.style.width = percent + "%";
+
+            if (currentQ < quizData.length) {
+                const q = quizData[currentQ];
+                quiz.innerHTML = `
+                    ${getLevelLabel()}
+                    <div class="question">${q.question}</div>
+                    <ul class="answers">
+                        ${q.options.map((opt, idx) => `
+                            <li>
+                                <label>
+                                    <input type="radio" name="answer" value="${idx}">
+                                    <span>${opt}</span>
+                                </label>
+                            </li>
+                        `).join('')}
+                    </ul>
+                    <button id="next-btn">Next</button>
+                `;
+                document.getElementById('next-btn').onclick = checkAnswer;
+                showGameButton();
+            } else {
+                showScore();
+            }
+        }
+
+        function checkAnswer() {
+            const radios = document.getElementsByName('answer');
+            let selected = -1;
+            radios.forEach((radio, idx) => {
+                if (radio.checked) selected = idx;
+            });
+            if (selected === -1) {
+                animateShake();
+                return;
+            }
+            showInfo(selected == quizData[currentQ].answer, quizData[currentQ].info);
+            if (selected == quizData[currentQ].answer) score++;
+        }
+
+        function animateShake() {
+            const quiz = document.getElementById('quiz');
+            quiz.style.animation = 'shake 0.35s';
+            quiz.style.borderColor = '#ff6e6e';
+            setTimeout(() => {
+                quiz.style.animation = '';
+                quiz.style.borderColor = '';
+            }, 360);
+        }
+        // Add shake animation
+        (() => {
+            const style = document.createElement('style');
+            style.innerHTML = `
+            @keyframes shake {
+                0% { transform: translateX(0px);}
+                20% { transform: translateX(-10px);}
+                40% { transform: translateX(10px);}
+                60% { transform: translateX(-7px);}
+                80% { transform: translateX(7px);}
+                100% { transform: translateX(0px);}
+            }`;
+            document.head.appendChild(style);
+        })();
+
+        function showInfo(correct, infoText) {
+            const quiz = document.getElementById('quiz');
+            quiz.innerHTML += `
+                <div class="info-anim${correct ? '' : ' wrong'}">
+                    <b>${correct ? "Correct!" : "Incorrect."}</b>
+                    <br>
+                    <span>${infoText}</span>
+                </div>
+                <button id="next-btn-continue" style="margin-top:18px;">Continue</button>
+            `;
+            document.getElementById('next-btn').disabled = true;
+            document.getElementById('next-btn-continue').onclick = () => {
+                currentQ++; 
+                loadQuiz();
+            };
+        }
+
+        function showScore() {
+            document.getElementById('progress-bar').style.width = "100%";
+            let message = "";
+            if (score === quizData.length) {
+                message = "🎉 Perfect score! You got everything right!";
+                fireConfetti();
+            } else if (score >= quizData.length * 0.7) {
+                message = "🎊 Great job! Try again for a perfect score!";
+                fireConfetti();
+            } else if (score >= quizData.length / 2) {
+                message = "👍 Good job! Try again to improve your score.";
+            } else {
+                message = "😅 Don't worry, keep practicing!";
+            }
+            document.getElementById('quiz').innerHTML = `
+                <div id="score">Your score: ${score} / ${quizData.length} <br>
+                <span style="font-size:1.1em;">${message}</span></div>
+                <button id="restart-btn">Restart Quiz</button>
+            `;
+            document.getElementById('restart-btn').onclick = restartAll;
+            showGameButton();
+        }
+
+        function restartAll() {
+            level = null;
+            topic = null;
+            quizData = [];
+            currentQ = 0;
+            score = 0;
+            document.getElementById('progress-bar-bg').style.display = 'none';
+            document.getElementById('quiz').innerHTML = '';
+            document.getElementById('level-select').style.display = 'block';
+            document.getElementById('confetti').innerHTML = '';
+        }
+
+        // Confetti animation for celebration
+        function fireConfetti() {
+            const confettiContainer = document.getElementById('confetti');
+            confettiContainer.innerHTML = '';
+            for (let i = 0; i < 40; i++) {
+                const conf = document.createElement('div');
+                conf.className = 'confetti-piece';
+                const left = Math.random() * 97;
+                const duration = 1.3 + Math.random() * 0.8;
+                const rotate = Math.random() * 360;
+                conf.style.left = left + "%";
+                conf.style.background = `linear-gradient(135deg, #6a82fb, #fc5c7d, #43cea2, #ffd86f, #e040fb)`;
+                conf.style.animationDuration = duration + "s";
+                conf.style.transform = `rotate(${rotate}deg)`;
+                confettiContainer.appendChild(conf);
+            }
+            setTimeout(() => { confettiContainer.innerHTML = ''; }, 2500);
+        }
+
+        // ========== FUN GAMES IMPLEMENTATIONS ==========
+
+        // HANGMAN GAME (General)
+        function showHangmanGame() {
+            const quiz = document.getElementById('quiz');
+            const wordObj = hangmanWords[Math.floor(Math.random() * hangmanWords.length)];
+            let word = wordObj.word;
+            let clue = wordObj.clue;
+            let guessed = [];
+            let wrong = [];
+            let maxWrong = 6;
+
+            function render() {
+                quiz.innerHTML = `
+                    <div class="game-section">
+                        <div class="level-label">Hangman - General Knowledge</div>
+                        <div style="margin-bottom:8px;"><b>Clue:</b> ${clue}</div>
+                        <div class="hangman-word">${word.split('').map(l => guessed.includes(l) ? l : "_").join(" ")}</div>
+                        <div class="hangman-letters">
+                            ${Array.from("ABCDEFGHIJKLMNOPQRSTUVWXYZ").map(l => 
+                                `<button ${guessed.includes(l) || wrong.includes(l) ? "disabled" : ""} 
+                                onclick="window.hmGuess('${l}')">${l}</button>`
+                            ).join("")}
+                        </div>
+                        <div class="hangman-status" id="hangman-status"></div>
+                        <button id="restart-btn" onclick="loadQuiz()">Back to Quiz</button>
+                        <div style="margin-top:12px; font-size:0.98em; color:#303f9f;">
+                            <b>Fun Fact:</b> When you guess the word, you'll learn an interesting fact!
+                        </div>
+                    </div>
+                `;
+                window.hmGuess = function(l) {
+                    if (word.includes(l)) guessed.push(l);
+                    else wrong.push(l);
+                    updateStatus();
+                    render();
+                }
+                updateStatus();
+            }
+            function updateStatus() {
+                const status = document.getElementById('hangman-status');
+                if (!status) return;
+                if (word.split('').every(l => guessed.includes(l))) {
+                    status.innerHTML = `<span style="color:#36bb47">🎉 You guessed it! The word was ${word}.<br>Did you know? ${getHangmanFact(word)}</span>`;
+                    document.querySelectorAll('.hangman-letters button').forEach(btn => btn.disabled = true);
+                } else if (wrong.length >= maxWrong) {
+                    status.innerHTML = `<span style="color:#a71111;">😢 Out of guesses! The word was ${word}.</span>`;
+                    document.querySelectorAll('.hangman-letters button').forEach(btn => btn.disabled = true);
+                } else {
+                    status.innerHTML = `<span>Wrong guesses: ${wrong.length} / ${maxWrong}</span>`;
+                }
+            }
+            render();
+        }
+        function getHangmanFact(word) {
+            if (word === "PARIS") return "Paris is home to the Eiffel Tower and famous for its art, fashion, and cuisine.";
+            if (word === "EGYPT") return "Egypt is known for its pyramids and ancient civilization along the Nile River.";
+            if (word === "PYTHON") return "Python is both a powerful programming language and the name of a non-venomous snake.";
+            return "";
+        }
+
+        // MEMORY GAME (Science)
+        function showMemoryGame() {
+            const quiz = document.getElementById('quiz');
+            let pairs = [...sciencePairs, ...sciencePairs].sort(() => Math.random() - 0.5);
+            let board = document.createElement('div');
+            board.className = 'memory-board';
+            let flipped = [];
+            let matched = [];
+            let canFlip = true;
+            quiz.innerHTML = `
+                <div class="game-section">
+                    <div class="level-label">Memory Match - Science</div>
+                    <div style="margin-bottom:8px;">Match the chemical symbol with its meaning.</div>
+                    <div class="memory-board" id="memory-board"></div>
+                    <div class="memory-status" id="memory-status"></div>
+                    <button id="restart-btn" onclick="loadQuiz()">Back to Quiz</button>
+                    <div style="margin-top:12px; font-size:0.98em; color:#303f9f;">
+                        <b>Tip:</b> Each pair will reveal a science fact!
+                    </div>
+                </div>
+            `;
+            let items = [];
+            pairs.forEach((pair, i) => {
+                items.push({
+                    id: i,
+                    type: i < sciencePairs.length ? 'symbol' : 'meaning',
+                    value: i < sciencePairs.length ? pair.symbol : pair.meaning,
+                    pairIndex: i % sciencePairs.length
+                });
+            });
+            items = items.sort(() => Math.random() - 0.5);
+            const boardDiv = document.getElementById('memory-board');
+            function render() {
+                boardDiv.innerHTML = '';
+                items.forEach((item, idx) => {
+                    const card = document.createElement('div');
+                    card.className = 'memory-card' + (flipped.includes(idx) || matched.includes(idx) ? ' flipped' : '');
+                    card.textContent = (flipped.includes(idx) || matched.includes(idx)) ? item.value : "?";
+                    card.onclick = () => {
+                        if (!canFlip || flipped.includes(idx) || matched.includes(idx)) return;
+                        flipped.push(idx);
+                        render();
+                        if (flipped.length === 2) {
+                            canFlip = false;
+                            setTimeout(() => {
+                                const [a, b] = flipped;
+                                if (
+                                    items[a].pairIndex === items[b].pairIndex &&
+                                    items[a].type !== items[b].type
+                                ) {
+                                    matched.push(a, b);
+                                    showMemoryStatus(`Matched: ${items[a].value} & ${items[b].value} — ${getScienceFact(items[a].pairIndex)}`);
+                                } else {
+                                    showMemoryStatus("Try again!");
+                                }
+                                flipped = [];
+                                canFlip = true;
+                                render();
+                                if (matched.length === items.length) {
+                                    showMemoryStatus("🎉 All pairs matched! Great job!");
+                                }
+                            }, 800);
+                        }
+                    };
+                    boardDiv.appendChild(card);
+                });
+            }
+            function showMemoryStatus(text) {
+                document.getElementById('memory-status').innerHTML = text;
+            }
+            render();
+        }
+        function getScienceFact(idx) {
+            if (idx === 0) return "H₂O is water, essential for all life.";
+            if (idx === 1) return "CO₂ is carbon dioxide, vital for plant photosynthesis.";
+            if (idx === 2) return "NaCl is table salt, important for human health.";
+            if (idx === 3) return "O₂ is oxygen, needed for respiration.";
+            return "";
+        }
+
+        // NUMBER PUZZLE (Math)
+        function showNumberPuzzle() {
+            const quiz = document.getElementById('quiz');
+            let board = shuffle([...numberPuzzleOriginal]);
+            function render() {
+                quiz.innerHTML = `
+                    <div class="game-section">
+                        <div class="level-label">Number Puzzle - Math</div>
+                        <div style="margin-bottom:8px;">Arrange the numbers in order (1-8, left to right, top to bottom). Click a tile next to the empty space to move.</div>
+                        <div class="memory-board" style="grid-template-columns: repeat(3, 50px);">
+                            ${board.map((n, i) => `
+                                <div class="memory-card${n === "" ? '' : ' flipped'}" onclick="window.npMove(${i})">${n === "" ? "" : n}</div>
+                            `).join('')}
+                        </div>
+                        <div class="memory-status" id="memory-status"></div>
+                        <button id="restart-btn" onclick="loadQuiz()">Back to Quiz</button>
+                        <div style="margin-top:12px; font-size:0.98em; color:#303f9f;">
+                            <b>Puzzle Fact:</b> The 8-puzzle is a classic sliding puzzle that improves logic skills!
+                        </div>
+                    </div>
+                `;
+                window.npMove = function(i) {
+                    const empty = board.indexOf("");
+                    const moves = [empty-1, empty+1, empty-3, empty+3];
+                    if (moves.includes(i) && !(empty%3===0 && i===empty-1) && !(empty%3===2 && i===empty+1)) {
+                        [board[empty], board[i]] = [board[i], board[empty]];
+                        render();
+                        checkSolved();
+                    }
+                }
+            }
+            function checkSolved() {
+                const solved = board.join("") === "12345678";
+                if (solved) {
+                    document.getElementById('memory-status').innerHTML = "🎉 Puzzle solved! You're a number puzzle master!";
+                }
+            }
+            render();
+        }
+        function shuffle(arr) {
+            let a = arr.slice(), n = a.length;
+            for(let i=n-1; i>0; i--){
+                let j = Math.floor(Math.random()*(i+1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            // Avoid solved state at start
+            if (a.join("") === "12345678") return shuffle(arr);
+            return a;
+        }
+
+        // Start: Show only level select
+        document.getElementById('progress-bar-bg').style.display = 'none';
+        document.getElementById('topic-select').style.display = 'none';
+
+    </script>
+</body>
+</html>
